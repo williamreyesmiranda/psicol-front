@@ -1,15 +1,16 @@
 <template>
   <q-page class="q-mt-sm q-mb-xl">
     <div class="q-pa-md q-gutter-xl col-6 justify-center">
-      <q-btn color="primary" icon="app_registration" label="Registrar Boleta" @click="registrarBoleta" />
+      <q-btn color="primary" icon="person_add_alt" label="Registrar Cliente" @click="registrarCliente" />
       <div style="max-width: 400px;">
-        <q-input outlined standout="bg-teal text-white" v-model="keyword" label="Buscar por código o descripción" />
+        <q-input outlined standout="bg-teal text-white" v-model="keyword"
+          label="Buscar por telefono, documento o nombre" />
       </div>
 
     </div>
     <div class="row q-mt-xl justify-center q-col-gutter-sm">
       <div class="col-10">
-        <q-table title="Boletas" :rows="tickets" :columns="columns" row-key="name" :loading="isLoading"
+        <q-table title="Clientes" :rows="tickets" :columns="columns" row-key="name" :loading="isLoading"
           :dense="$q.screen.lt.md" :pagination="initialPagination">
           <template v-slot:body-cell-actions="props">
             <q-td :props="props">
@@ -25,29 +26,24 @@
   <q-dialog v-model="modal" transition-show="scale" transition-hide="scale">
     <q-card class="" style="width: 400px">
       <q-card-section>
-        <div class="text-h6">Editar Boleta</div>
+        <div class="text-h6">Editar Cliente</div>
       </q-card-section>
 
       <q-card-section class="q-pt-none">
         <q-form ref="focus" @submit.prevent="onUpdate" class="q-gutter-sm">
 
-          <q-input filled v-model.trim.lazy="valUpdate.codigo" label="Código *" lazy-rules
-            :rules="[ val => val && val.length > 0 || 'Por favor ingresa un código']" />
+          <q-input filled v-model.trim.lazy="valUpdate.documento" label="Documento *" lazy-rules
+            :rules="[ val => val && val.length > 0 || 'Por favor ingresa un documento']" />
 
-          <q-input filled v-model.trim.lazy="valUpdate.descripcion" label="Descripción *" lazy-rules
-            :rules="[ val => val && val.length > 0 || 'Por favor ingresa una descripcion']" />
+          <q-input filled v-model.trim.lazy="valUpdate.nombre" label="Nombre *" lazy-rules
+            :rules="[ val => val && val.length > 0 || 'Por favor ingresa un nombre']" />
 
-          <q-input filled type="number" v-model="valUpdate.precio" label="Precio *" lazy-rules :rules="[
-            val => val !== null && val !== '' || 'Por favor ingresa un precio',
-          ]" />
-
-          <q-input filled type="number" v-model="valUpdate.stock" label="stock *" lazy-rules :rules="[
-            val => val !== null && val !== '' || 'Por favor ingresa un stock',
-            val => val > 0 && val < 4000 || 'Ingresa un stock real'
+          <q-input filled v-model="valUpdate.telefono" label="Telefono *" lazy-rules :rules="[
+            val => val !== null && val.length > 0 || 'Por favor ingresa un telefono',
           ]" />
 
           <div>
-            <q-btn label="Actualizar Boleta" type="submit" color="primary" />
+            <q-btn label="Actualizar Cliente" type="submit" color="primary" />
           </div>
         </q-form>
       </q-card-section>
@@ -60,7 +56,7 @@
 </template>
 <script>
 import { defineComponent, watch, ref } from 'vue'
-import useBoletas from '../composables/useBoletas'
+import useClientes from '../composables/useClientes'
 import { useRouter } from 'vue-router';
 import useGeneral from '../../../composables/useGeneral'
 import { useQuasar } from 'quasar';
@@ -69,10 +65,9 @@ import { useQuasar } from 'quasar';
 const columns = [
 
   { name: 'id', align: 'center', label: 'ID', field: 'id', sortable: true },
-  { name: 'codigo', align: 'center', label: 'Codigo', field: 'codigo', sortable: true },
-  { name: 'descripcion', align: 'center', label: 'Descripcion', field: 'descripcion', sortable: true },
-  { name: 'precio', align: 'center', label: 'Precio', field: 'precio', sortable: true },
-  { name: 'stock', align: 'center', label: 'Stock', field: 'stock', sortable: true },
+  { name: 'documento', align: 'center', label: 'Documento', field: 'documento', sortable: true },
+  { name: 'nombre', align: 'center', label: 'Nombre', field: 'nombre', sortable: true },
+  { name: 'telefono', align: 'center', label: 'Telefono', field: 'telefono', sortable: true },
   { name: 'actions', label: 'Acciones', field: '', align: 'center' },
 ]
 
@@ -80,7 +75,7 @@ export default defineComponent({
   name: 'IndexPage',
 
   setup(props) {
-    const { verBoletas, boletas, eliminarBoleta, actualizarBoleta } = useBoletas()
+    const { verClientes, clientes, eliminarCliente, actualizarCliente } = useClientes()
     const router = useRouter()
     const { isLoading } = useGeneral()
     const $q = useQuasar()
@@ -96,60 +91,56 @@ export default defineComponent({
     })
 
 
-    const verifyDelete = async (boleta) => {
-      console.log(boleta);
+    const verifyDelete = async (cliente) => {
+      console.log(cliente);
       $q.dialog({
         title: 'Eliminar',
-        message: `¿Desea eliminar la boleta con código ${boleta.codigo} de la lista?`,
+        message: `¿Desea eliminar el cliente ${cliente.nombre} de la lista?`,
         cancel: true,
         persistent: true
       }).onOk(async () => {
-        const resp = await eliminarBoleta(boleta.id);
+        const resp = await eliminarCliente(cliente.id);
         if (resp) {
           $q.notify({
             color: 'success',
             icon: 'done',
             message: 'Cliente eliminado correctamente'
           })
-          verBoletas();
+          verClientes();
 
         } else {
           return $q.notify({
             color: 'red-5',
             textColor: 'white',
             icon: 'warning',
-            message: 'Ocurrió un problema al intentar eliminar la boleta'
+            message: 'Ocurrió un problema al intentar eliminar el cliente'
           })
         }
       })
     }
 
-    const editRow = (boleta) => {
-      valUpdate.value = { ...boleta };
+    const editRow = (cliente) => {
+      valUpdate.value = { ...cliente };
       modal.value = true;
     }
 
     const onUpdate = async () => {
-      console.log('por aca');
 
-      valUpdate.value.precio = parseInt(valUpdate.value.precio)
-      valUpdate.value.stock = parseInt(valUpdate.value.stock)
-
-      const resp = await actualizarBoleta(valUpdate.value);
+      const resp = await actualizarCliente(valUpdate.value);
       if (resp) {
         $q.notify({
           color: 'success',
           icon: 'done',
-          message: 'Boleta actualizada correctamente'
+          message: 'Cliente actualizada correctamente'
         })
-        verBoletas();
+        verClientes();
 
       } else {
         return $q.notify({
           color: 'red-5',
           textColor: 'white',
           icon: 'warning',
-          message: 'Ocurrió un problema al intentar actualizar la boleta'
+          message: 'Ocurrió un problema al intentar actualizar el cliente'
         })
       }
 
@@ -157,20 +148,20 @@ export default defineComponent({
     }
 
 
-    watch(() => boletas.value(),
+    watch(() => clientes.value(),
       () => {
-        tickets.value = boletas.value();
+        tickets.value = clientes.value();
       }
     )
 
     watch(
       () => keyword.value,
       () => {
-        tickets.value = boletas.value(keyword.value);
+        tickets.value = clientes.value(keyword.value);
       }
     )
 
-    verBoletas()
+    verClientes()
 
     return {
       initialPagination,
@@ -183,8 +174,8 @@ export default defineComponent({
       editRow,
       verifyDelete,
       onUpdate,
-      registrarBoleta: () => {
-        router.push({ name: 'registrarBoleta' })
+      registrarCliente: () => {
+        router.push({ name: 'registrarCliente' })
       },
 
     }

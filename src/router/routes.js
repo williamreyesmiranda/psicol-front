@@ -1,4 +1,5 @@
 import Boletas from '../modules/boletas/router/index'
+import Clientes from '../modules/clientes/router/index'
 const routes = [
   {
     path: '/',
@@ -10,6 +11,10 @@ const routes = [
   {
     path: '/boletas',
     ...Boletas
+  },
+  {
+    path: '/clientes',
+    ...Clientes
   },
 
   // Always leave this as last one,

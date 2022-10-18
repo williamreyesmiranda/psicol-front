@@ -2,6 +2,7 @@ import { store } from 'quasar/wrappers'
 import { createStore } from 'vuex'
 import boletas from '../modules/boletas/store/index'
 import general from './general/index'
+import clientes from '../modules/clientes/store/index'
 
 // import example from './module-example'
 
@@ -18,7 +19,8 @@ export default store(function (/* { ssrContext } */) {
   const Store = createStore({
     modules: {
       general,
-      boletas
+      boletas,
+      clientes,
     },
 
     // enable strict mode (adds overhead!)

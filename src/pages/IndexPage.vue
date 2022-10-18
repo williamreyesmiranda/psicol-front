@@ -1,5 +1,19 @@
 <template>
-  hola
+  <q-page>
+    <div class="q-mt-sm">
+      <h4>Prueba creada por William Reyes Miranda (1124023751)</h4>
+      <div>
+        Módulos creados con CRUD:
+
+      </div>
+      <div class="row">
+        <ul>
+          <li>Clientes</li>
+          <li>Boletas</li>
+        </ul>
+      </div>
+    </div>
+  </q-page>
 </template>
 
 <script>
