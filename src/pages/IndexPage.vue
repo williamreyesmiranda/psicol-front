@@ -1,17 +1,28 @@
 <template>
-  <q-page class="flex flex-center">
-    <img
-      alt="Quasar logo"
-      src="~assets/quasar-logo-vertical.svg"
-      style="width: 200px; height: 200px"
-    >
-  </q-page>
+  hola
 </template>
 
 <script>
 import { defineComponent } from 'vue'
 
+const columns = [
+
+  { name: 'id', align: 'center', label: 'ID', field: 'id', sortable: true },
+  { name: 'codigo', align: 'center', label: 'Codigo', field: 'codigo', sortable: true },
+  { name: 'descripcion', align: 'center', label: 'Descripcion', field: 'descripcion', sortable: true },
+  { name: 'actions', label: 'Acciones', field: '', align: 'center' },
+]
+
 export default defineComponent({
-  name: 'IndexPage'
+  name: 'IndexPage',
+
+  setup(props) {
+
+
+
+    return {
+      columns
+    }
+  }
 })
 </script>
